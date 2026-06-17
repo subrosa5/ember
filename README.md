@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ember
 
-## Getting Started
+An autonomous coding agent that runs in the browser. You give it a task; it
+plans, reads/writes files, and runs shell commands — all inside an isolated,
+ephemeral [Vercel Sandbox](https://vercel.com/docs/vercel-sandbox) VM, never
+on your real machine.
 
-First, run the development server:
+Built with Next.js, the [Vercel AI SDK](https://ai-sdk.dev) `ToolLoopAgent`,
+and `@vercel/sandbox`.
+
+## How it works
+
+- Each browser session gets its own persistent sandbox (`src/lib/sandbox.ts`).
+- The agent (`src/lib/agent.ts`) has four tools (`src/lib/tools.ts`): read
+  file, write file, list directory, run shell command — all executed inside
+  that sandbox.
+- `src/app/api/agent/route.ts` streams the agent's reasoning and tool calls
+  to the browser via `createAgentUIStreamResponse`.
+- The UI (`src/components/`) renders it as a black/red/gold terminal console.
+
+## Setup
+
+### 1. Model access (AI Gateway)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Get an API key from [Vercel AI Gateway](https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai-gateway%2Fapi-keys)
+and set it as `AI_GATEWAY_API_KEY` in `.env.local`. (On a Vercel deployment
+this is automatic via OIDC — no key needed.)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Sandbox access
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+vercel link
+vercel env pull
+```
 
-## Learn More
+This pulls a short-lived `VERCEL_OIDC_TOKEN` into `.env.local`, which
+`@vercel/sandbox` uses to create VMs. It expires after ~12h locally — rerun
+`vercel env pull` when it does. In production on Vercel this is automatic.
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Run
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+vercel deploy --prod
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Costs to be aware of: every message triggers a model call (billed through
+your Vercel/Anthropic usage) and may spin up a sandbox VM (billed per
+second of use, see [Sandbox pricing](https://vercel.com/docs/vercel-sandbox)).
+If you deploy this publicly without authentication, anyone with the URL can
+run up your bill — add auth before sharing the link widely.
