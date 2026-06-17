@@ -1,5 +1,7 @@
 # Ember
 
+**[→ Open Ember](https://ember-nine-dun.vercel.app)**
+
 An autonomous coding agent that runs in the browser. You give it a task; it
 plans, reads/writes files, and runs shell commands — all inside an isolated,
 ephemeral [Vercel Sandbox](https://vercel.com/docs/vercel-sandbox) VM, never
