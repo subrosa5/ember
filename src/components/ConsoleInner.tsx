@@ -51,7 +51,7 @@ export function ConsoleInner({ sessionId }: { sessionId: string }) {
             onChange={(e) => setModel(e.target.value)}
             disabled={busy}
             title="Model used for the next message"
-            className="bg-[var(--color-bg-panel)] border border-[var(--color-border)] text-[var(--color-gold)] text-[11px] uppercase tracking-wide px-2 py-1 outline-none disabled:opacity-50 hover:border-[var(--color-gold)] transition-colors"
+            className="appearance-none bg-transparent text-[var(--color-gold)] text-[11px] uppercase tracking-wide px-1 py-1 outline-none cursor-pointer disabled:opacity-50 disabled:cursor-default hover:text-[var(--color-gold-bright)] focus:text-[var(--color-gold-bright)] transition-colors"
           >
             {MODEL_OPTIONS.map((m) => (
               <option key={m.id} value={m.id} className="bg-[var(--color-bg-panel)]">
