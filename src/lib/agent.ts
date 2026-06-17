@@ -1,8 +1,13 @@
 import { ToolLoopAgent, stepCountIs, type InferAgentUIMessage } from "ai";
+import { groq } from "@ai-sdk/groq";
 import type { Sandbox } from "@vercel/sandbox";
 import { buildTools } from "./tools";
+import { DEFAULT_MODEL_ID, getModelOption } from "./models";
 
-const MODEL = process.env.EMBER_MODEL || "anthropic/claude-sonnet-4.6";
+function resolveModel(modelId: string) {
+  const option = getModelOption(modelId) ?? getModelOption(DEFAULT_MODEL_ID)!;
+  return option.provider === "groq" ? groq(option.id) : option.id;
+}
 
 const INSTRUCTIONS = `You are Ember, an autonomous coding agent running inside an isolated sandbox VM.
 
@@ -16,9 +21,9 @@ How you work:
 - Be concise. Don't pad responses with filler.
 - You are operating in a disposable sandbox with no access to the user's real machine, so you do not need to ask for confirmation before running commands inside it — but you should still stop and explain if a request is ambiguous or could produce a very large/expensive amount of work.`;
 
-export function createAgent(sandbox: Sandbox) {
+export function createAgent(sandbox: Sandbox, modelId: string = DEFAULT_MODEL_ID) {
   return new ToolLoopAgent({
-    model: MODEL,
+    model: resolveModel(modelId),
     instructions: INSTRUCTIONS,
     tools: buildTools(sandbox),
     stopWhen: stepCountIs(15),

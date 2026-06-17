@@ -4,17 +4,24 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isToolUIPart } from "ai";
 import { useRef, useState } from "react";
 import type { EmberUIMessage } from "@/lib/agent";
+import { MODEL_OPTIONS, DEFAULT_MODEL_ID } from "@/lib/models";
 import { ToolCall } from "./ToolCall";
 
 export function ConsoleInner({ sessionId }: { sessionId: string }) {
   const [input, setInput] = useState("");
+  const [model, setModel] = useState(DEFAULT_MODEL_ID);
   const logEndRef = useRef<HTMLDivElement>(null);
 
+  const [transport] = useState(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/agent",
+        body: { sessionId },
+      })
+  );
+
   const { messages, sendMessage, status, error } = useChat<EmberUIMessage>({
-    transport: new DefaultChatTransport({
-      api: "/api/agent",
-      body: { sessionId },
-    }),
+    transport,
     onFinish: () => {
       logEndRef.current?.scrollIntoView({ behavior: "smooth" });
     },
@@ -26,20 +33,36 @@ export function ConsoleInner({ sessionId }: { sessionId: string }) {
     e.preventDefault();
     const text = input.trim();
     if (!text || busy) return;
-    sendMessage({ text });
+    sendMessage({ text }, { body: { model } });
     setInput("");
     requestAnimationFrame(() => logEndRef.current?.scrollIntoView({ behavior: "smooth" }));
   }
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <header className="border-b border-[var(--color-border)] px-4 py-3 flex items-baseline justify-between shrink-0">
-        <h1 className="text-[var(--color-gold)] text-lg tracking-wider">
+      <header className="border-b border-[var(--color-border)] px-4 py-3 flex items-baseline justify-between gap-4 shrink-0">
+        <h1 className="text-[var(--color-gold)] text-lg tracking-wider shrink-0">
           EMBER<span className="text-[var(--color-red)]">_</span>
         </h1>
-        <p className="text-[11px] text-[var(--color-text-dim)] uppercase tracking-widest">
-          sandboxed autonomous agent · session {sessionId.slice(0, 8)}
-        </p>
+
+        <div className="flex items-center gap-3">
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            disabled={busy}
+            title="Model used for the next message"
+            className="bg-[var(--color-bg-panel)] border border-[var(--color-border)] text-[var(--color-gold)] text-[11px] uppercase tracking-wide px-2 py-1 outline-none disabled:opacity-50 hover:border-[var(--color-gold)] transition-colors"
+          >
+            {MODEL_OPTIONS.map((m) => (
+              <option key={m.id} value={m.id} className="bg-[var(--color-bg-panel)]">
+                {m.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-[11px] text-[var(--color-text-dim)] uppercase tracking-widest whitespace-nowrap">
+            sandboxed autonomous agent · session {sessionId.slice(0, 8)}
+          </p>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
