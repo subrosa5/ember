@@ -21,7 +21,7 @@ export function createAgent(sandbox: Sandbox) {
     model: MODEL,
     instructions: INSTRUCTIONS,
     tools: buildTools(sandbox),
-    stopWhen: stepCountIs(30),
+    stopWhen: stepCountIs(15),
   });
 }
 

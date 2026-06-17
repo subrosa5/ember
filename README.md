@@ -50,6 +50,24 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Built-in abuse protection
+
+Every message can trigger several LLM calls and spin up a sandbox VM, so a
+script hammering the endpoint could run up your AI Gateway bill fast. Two
+guards are in place:
+
+- **Per-IP rate limit** (`src/lib/rate-limit.ts`): max 8 requests per 10
+  minutes per IP, backed by [Vercel Runtime Cache](https://vercel.com/docs/runtime-cache)
+  (falls back to in-memory locally). Excess requests get a `429`.
+- **Capped agent loop** (`src/lib/agent.ts`): each message can run at most 15
+  tool-loop steps, bounding the worst-case cost of a single request.
+
+This isn't bulletproof (a botnet spreading across many IPs would still get
+through) — for stronger protection, set a spending limit on AI Gateway in
+your Vercel dashboard, or add the WAF custom-rule rate limit described in
+[Vercel Firewall docs](https://vercel.com/docs/vercel-firewall/vercel-waf/custom-rules)
+(requires Pro plan).
+
 ## Deploy
 
 ```bash

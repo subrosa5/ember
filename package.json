@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.209",
+    "@vercel/functions": "^3.7.1",
     "@vercel/sandbox": "^2.2.1",
     "ai": "^6.0.207",
     "next": "16.2.9",
