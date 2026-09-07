@@ -1,5 +1,10 @@
 # Ember
 
+![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)
+![Vercel AI SDK](https://img.shields.io/badge/Vercel_AI_SDK-ToolLoopAgent-black?style=flat-square&logo=vercel)
+![Vercel Sandbox](https://img.shields.io/badge/Vercel_Sandbox-sandboxed_exec-black?style=flat-square&logo=vercel)
+
 **[→ Open Ember](https://ember-nine-dun.vercel.app)**
 
 An autonomous coding agent that runs in the browser. You give it a task; it
